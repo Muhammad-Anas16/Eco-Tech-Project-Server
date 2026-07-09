@@ -96,6 +96,29 @@ export const TrendingLogTable = async () => {
 };
 
 /* Trend Log History */
+// export const TrendingLogDataTable = async () => {
+//   await database.execute(`
+//     CREATE TABLE IF NOT EXISTS trendlog_data (
+
+//       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+//       host VARCHAR(50) NOT NULL,
+//       instance VARCHAR(50) NOT NULL,
+
+//       time DATETIME(3) NOT NULL,
+
+//       value DECIMAL(18,6),
+
+//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+//       INDEX idx_trend (host,instance,time)
+
+//     )
+//   `);
+
+//   console.log("Trendlog Data table is ready 😇");
+// };
+
 export const TrendingLogDataTable = async () => {
   await database.execute(`
     CREATE TABLE IF NOT EXISTS trendlog_data (
@@ -111,7 +134,9 @@ export const TrendingLogDataTable = async () => {
 
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-      INDEX idx_trend (host,instance,time)
+      INDEX idx_trend (host, instance, time),
+
+      UNIQUE KEY unique_trend_history (host, instance, time)
 
     )
   `);
@@ -149,6 +174,34 @@ export const EnergylogTable = async () => {
 };
 
 /* Energy History */
+// export const EnergylogDataTable = async () => {
+//   await database.execute(`
+//     CREATE TABLE IF NOT EXISTS utility_data (
+
+//       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+//       host VARCHAR(50) NOT NULL,
+
+//       instance VARCHAR(50) NOT NULL,
+
+//       parameter VARCHAR(50),
+
+//       time DATETIME(3) NOT NULL,
+
+//       value DECIMAL(18,6),
+
+//       unit VARCHAR(30),
+
+//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+//       INDEX idx_energy (host,instance,time)
+
+//     )
+//   `);
+
+//   console.log("Utility Data table is ready 😇");
+// };
+
 export const EnergylogDataTable = async () => {
   await database.execute(`
     CREATE TABLE IF NOT EXISTS utility_data (
@@ -156,9 +209,7 @@ export const EnergylogDataTable = async () => {
       id BIGINT AUTO_INCREMENT PRIMARY KEY,
 
       host VARCHAR(50) NOT NULL,
-
       instance VARCHAR(50) NOT NULL,
-
       parameter VARCHAR(50),
 
       time DATETIME(3) NOT NULL,
@@ -169,12 +220,12 @@ export const EnergylogDataTable = async () => {
 
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-      INDEX idx_energy (host,instance,time)
+      INDEX idx_energy (host, instance, time),
+
+      UNIQUE KEY unique_energy_history (host, instance, parameter, time)
 
     )
   `);
 
   console.log("Utility Data table is ready 😇");
 };
-
-

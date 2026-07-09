@@ -32,8 +32,6 @@ router.get("/trend", async (req, res) => {
 
     const sqlData = await getTrendLogs();
     ResHelper(res, 200, true, "Getting Trend Logs", sqlData);
-
-    res.send(sqlData);
   } catch (error) {
     ResHelper(res, 500, false, error.message, null);
   }
@@ -55,7 +53,6 @@ router.get("/trend/:instance", async (req, res) => {
     );
     const sqlData = await getTrendLogData(req.params.instance);
     ResHelper(res, 200, true, "Getting Trend Log Data", sqlData);
-    res.send(data?.response?.record);
   } catch (error) {
     ResHelper(res, 500, false, error.message, null);
   }
@@ -70,7 +67,6 @@ router.get("/energy", async (req, res) => {
     const sqlData = await getEnergyLogs();
 
     ResHelper(res, 200, true, "Getting Energy Logs", sqlData);
-    // res.send(data?.response?.energylog);
   } catch (error) {
     ResHelper(res, 500, false, error.message, null);
   }
@@ -98,8 +94,6 @@ router.get("/energy/:instance/:parameter", async (req, res) => {
       req.params.instance,
       req.params.parameter,
     );
-
-    // res.send(sqlData);
 
     ResHelper(res, 200, true, "Getting Energy Log Data", sqlData);
   } catch (error) {

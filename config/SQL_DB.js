@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import "dotenv/config";
 import {
   EnergylogDataTable,
   EnergylogTable,
@@ -43,7 +44,12 @@ const SQL_DB = async () => {
     await TrendingLogTable();
     await TrendingLogDataTable();
     await EnergylogTable();
-    await EnergylogDataTable()
+    await EnergylogDataTable();
+
+    // const [rows] = await database.execute("SELECT DATABASE() AS databaseName");
+    // const [rows] = await database.execute("SELECT * FROM trendlog_data");
+
+    // console.log(rows[0]);
   } catch (error) {
     console.log("Database Error ❌");
     console.log(error.message);
