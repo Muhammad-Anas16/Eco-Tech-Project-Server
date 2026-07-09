@@ -22,8 +22,8 @@ const startServer = async () => {
   try {
     await SQL_DB();
     // await dropTables(); // for deleting all the tables
-    app.listen(PORT, () => {
-      console.log(`🚀 Server Running : http://localhost:${PORT}`);
+    app.listen(5000, "0.0.0.0", () => {
+      console.log("Access from network: http://192.168.1.106:5000");
     });
   } catch (error) {
     console.log("❌ Server Start Failed");
