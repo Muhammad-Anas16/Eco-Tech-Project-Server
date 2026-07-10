@@ -1,6 +1,7 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import "dotenv/config";
+
 import {
   TrendingLogTable,
   TrendingLogDataTable,
@@ -17,7 +18,17 @@ const SQLite_DB = async () => {
       driver: sqlite3.Database,
     });
 
-    await database.exec("PRAGMA foreign_keys = ON;");
+    // ==========================
+    // SQLite Performance Settings
+    // ==========================
+    await database.exec(`
+      PRAGMA journal_mode = WAL;
+      PRAGMA synchronous = NORMAL;
+      PRAGMA foreign_keys = ON;
+      PRAGMA temp_store = MEMORY;
+      PRAGMA cache_size = -10000;
+      PRAGMA busy_timeout = 10000;
+    `);
 
     console.log("SQLite Database Connected 😃");
 
