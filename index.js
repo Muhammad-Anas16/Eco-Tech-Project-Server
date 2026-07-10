@@ -8,6 +8,7 @@ import SQLite_DB from "./config/SQLite_DB.js";
 import dataRoutes from "./routes/dataRoutes.js";
 import trendRoutes from "./routes/trendRoutes.js";
 import energyRoutes from "./routes/energyRoutes.js";
+import startSyncService from "./services/syncService.js";
 
 const app = express();
 const PORT = 5000;
@@ -24,7 +25,7 @@ app.get("/", (req, res) => {
 const startServer = async () => {
   try {
     await SQLite_DB();
-    // await dropTables(); // for deleting all the tables
+    startSyncService();
     app.listen(5000, "0.0.0.0", () => {
       console.log("Access from network: http://192.168.1.106:5000");
     });

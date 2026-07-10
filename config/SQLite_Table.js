@@ -1,230 +1,101 @@
-// // import { database } from "./SQL_DB.js";
-
-// // export const TrendingLogTable = async () => {
-// //   try {
-// //     await database.execute(`
-// //       CREATE TABLE IF NOT EXISTS trendlog (
-// //         id INT AUTO_INCREMENT PRIMARY KEY,
-// //         host VARCHAR(50) NOT NULL,
-// //         instance VARCHAR(50) NOT NULL,
-// //         description VARCHAR(255),
-// //         loggedHost VARCHAR(50),
-// //         loggedInstance VARCHAR(50),
-// //         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-// //         UNIQUE KEY unique_trendlog (host, instance)
-// //       )
-// //     `);
-
-// //     console.log("Trendlog table is ready 😇");
-// //   } catch (error) {
-// //     console.log("Table Creation Error 🤬");
-// //     console.log(error.message);
-// //     throw error;
-// //   }
-// // };
-
-// // export const TrendingLogDataTable = async () => {
-// //   try {
-// //     await database.execute(`
-// //       CREATE TABLE IF NOT EXISTS trendlog_data (
-// //         id INT AUTO_INCREMENT PRIMARY KEY,
-// //         time DATETIME(3) NOT NULL,
-// //         value DECIMAL(10,6) NOT NULL,
-// //         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-// //         UNIQUE KEY unique_trendlog_data (time)
-// //       )
-// //     `);
-
-// //     console.log("Trendlog Data table is ready  😇");
-// //   } catch (error) {
-// //     console.log("Table Creation Error 🤬");
-// //     console.log(error.message);
-// //     throw error;
-// //   }
-// // };
-
-// // export const EnergylogTable = async () => {
-// //   try {
-// //     await database.execute(`
-// //       CREATE TABLE IF NOT EXISTS utility (
-// //         id INT AUTO_INCREMENT PRIMARY KEY,
-
-// //         name VARCHAR(255) NOT NULL,
-// //         description TEXT,
-// //         host VARCHAR(50) NOT NULL,
-// //         instance VARCHAR(50) NOT NULL,
-// //         utilityType VARCHAR(100),
-// //         parameter VARCHAR(50),
-
-// //         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-// //         UNIQUE KEY unique_utility (host, instance)
-// //       )
-// //     `);
-
-// //     console.log("Utility table is ready  😇");
-// //   } catch (error) {
-// //     console.log("Utility Table Creation Error 🤬");
-// //     console.log(error.message);
-// //     throw error;
-// //   }
-// // };
-
 // import { database } from "./SQLite_DB.js";
 
-// /* Trend Log Master */
+// //  Trend Log Master
 // export const TrendingLogTable = async () => {
-//   await database.execute(`
+//   await database.exec(`
 //     CREATE TABLE IF NOT EXISTS trendlog (
-//       id INT AUTO_INCREMENT PRIMARY KEY,
+//       id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-//       host VARCHAR(50) NOT NULL,
-//       instance VARCHAR(50) NOT NULL,
+//       host TEXT NOT NULL,
+//       instance TEXT NOT NULL,
 
-//       description VARCHAR(255),
-//       loggedHost VARCHAR(50),
-//       loggedInstance VARCHAR(50),
+//       description TEXT,
+//       loggedHost TEXT,
+//       loggedInstance TEXT,
 
-//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+//       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-//       UNIQUE KEY unique_trendlog (host, instance)
-//     )
+//       UNIQUE(host, instance)
+//     );
 //   `);
 
 //   console.log("Trendlog table is ready 😇");
 // };
 
-// /* Trend Log History */
-// // export const TrendingLogDataTable = async () => {
-// //   await database.execute(`
-// //     CREATE TABLE IF NOT EXISTS trendlog_data (
-
-// //       id BIGINT AUTO_INCREMENT PRIMARY KEY,
-
-// //       host VARCHAR(50) NOT NULL,
-// //       instance VARCHAR(50) NOT NULL,
-
-// //       time DATETIME(3) NOT NULL,
-
-// //       value DECIMAL(18,6),
-
-// //       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-// //       INDEX idx_trend (host,instance,time)
-
-// //     )
-// //   `);
-
-// //   console.log("Trendlog Data table is ready 😇");
-// // };
-
+// //  Trend Log History
 // export const TrendingLogDataTable = async () => {
-//   await database.execute(`
+//   await database.exec(`
 //     CREATE TABLE IF NOT EXISTS trendlog_data (
+//       id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-//       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+//       trendlog_id INTEGER NOT NULL,
 
-//       host VARCHAR(50) NOT NULL,
-//       instance VARCHAR(50) NOT NULL,
+//       time TEXT NOT NULL,
+//       value REAL,
 
-//       time DATETIME(3) NOT NULL,
+//       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-//       value DECIMAL(18,6),
+//       FOREIGN KEY (trendlog_id)
+//         REFERENCES trendlog(id)
+//         ON DELETE CASCADE,
 
-//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+//       UNIQUE(trendlog_id, time)
+//     );
 
-//       INDEX idx_trend (host, instance, time),
-
-//       UNIQUE KEY unique_trend_history (host, instance, time)
-
-//     )
+//     CREATE INDEX IF NOT EXISTS idx_trendlog_data
+//     ON trendlog_data(trendlog_id, time);
 //   `);
 
 //   console.log("Trendlog Data table is ready 😇");
 // };
 
-// /* Energy Master */
+// //  Utility Master
 // export const EnergylogTable = async () => {
-//   await database.execute(`
+//   await database.exec(`
 //     CREATE TABLE IF NOT EXISTS utility (
+//       id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-//       id INT AUTO_INCREMENT PRIMARY KEY,
-
-//       name VARCHAR(255),
-
+//       name TEXT,
 //       description TEXT,
 
-//       host VARCHAR(50) NOT NULL,
+//       host TEXT NOT NULL,
+//       instance TEXT NOT NULL,
 
-//       instance VARCHAR(50) NOT NULL,
+//       utilityType TEXT,
+//       parameter TEXT,
 
-//       utilityType VARCHAR(100),
+//       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-//       parameter VARCHAR(50),
-
-//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-//       UNIQUE KEY unique_utility (host,instance)
-
-//     )
+//       UNIQUE(host, instance)
+//     );
 //   `);
 
 //   console.log("Utility table is ready 😇");
 // };
 
-// /* Energy History */
-// // export const EnergylogDataTable = async () => {
-// //   await database.execute(`
-// //     CREATE TABLE IF NOT EXISTS utility_data (
-
-// //       id BIGINT AUTO_INCREMENT PRIMARY KEY,
-
-// //       host VARCHAR(50) NOT NULL,
-
-// //       instance VARCHAR(50) NOT NULL,
-
-// //       parameter VARCHAR(50),
-
-// //       time DATETIME(3) NOT NULL,
-
-// //       value DECIMAL(18,6),
-
-// //       unit VARCHAR(30),
-
-// //       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-// //       INDEX idx_energy (host,instance,time)
-
-// //     )
-// //   `);
-
-// //   console.log("Utility Data table is ready 😇");
-// // };
-
+// //  Utility History
 // export const EnergylogDataTable = async () => {
-//   await database.execute(`
+//   await database.exec(`
 //     CREATE TABLE IF NOT EXISTS utility_data (
+//       id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-//       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+//       utility_id INTEGER NOT NULL,
 
-//       host VARCHAR(50) NOT NULL,
-//       instance VARCHAR(50) NOT NULL,
-//       parameter VARCHAR(50),
+//       time TEXT NOT NULL,
+//       value REAL,
+//       unit TEXT,
 
-//       time DATETIME(3) NOT NULL,
+//       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-//       value DECIMAL(18,6),
+//       FOREIGN KEY (utility_id)
+//         REFERENCES utility(id)
+//         ON DELETE CASCADE,
 
-//       unit VARCHAR(30),
+//       UNIQUE(utility_id, time)
+//     );
 
-//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-//       INDEX idx_energy (host, instance, time),
-
-//       UNIQUE KEY unique_energy_history (host, instance, parameter, time)
-
-//     )
+//     CREATE INDEX IF NOT EXISTS idx_utility_data
+//     ON utility_data(utility_id, time);
 //   `);
 
 //   console.log("Utility Data table is ready 😇");
@@ -232,7 +103,9 @@
 
 import { database } from "./SQLite_DB.js";
 
-//  Trend Log Master
+// ==========================
+// Trend Log Master
+// ==========================
 export const TrendingLogTable = async () => {
   await database.exec(`
     CREATE TABLE IF NOT EXISTS trendlog (
@@ -249,12 +122,17 @@ export const TrendingLogTable = async () => {
 
       UNIQUE(host, instance)
     );
+
+    CREATE INDEX IF NOT EXISTS idx_trendlog_master
+    ON trendlog(host, instance);
   `);
 
   console.log("Trendlog table is ready 😇");
 };
 
-//  Trend Log History
+// ==========================
+// Trend Log History
+// ==========================
 export const TrendingLogDataTable = async () => {
   await database.exec(`
     CREATE TABLE IF NOT EXISTS trendlog_data (
@@ -281,7 +159,9 @@ export const TrendingLogDataTable = async () => {
   console.log("Trendlog Data table is ready 😇");
 };
 
-//  Utility Master
+// ==========================
+// Utility Master
+// ==========================
 export const EnergylogTable = async () => {
   await database.exec(`
     CREATE TABLE IF NOT EXISTS utility (
@@ -294,18 +174,23 @@ export const EnergylogTable = async () => {
       instance TEXT NOT NULL,
 
       utilityType TEXT,
-      parameter TEXT,
+      parameter TEXT NOT NULL,
 
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-      UNIQUE(host, instance)
+      UNIQUE(host, instance, parameter)
     );
+
+    CREATE INDEX IF NOT EXISTS idx_utility_master
+    ON utility(host, instance, parameter);
   `);
 
   console.log("Utility table is ready 😇");
 };
 
-//  Utility History
+// ==========================
+// Utility History
+// ==========================
 export const EnergylogDataTable = async () => {
   await database.exec(`
     CREATE TABLE IF NOT EXISTS utility_data (

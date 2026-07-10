@@ -14,96 +14,142 @@ import {
   saveEnergyLogData,
 } from "./saveDataService.js";
 
-//    Sync Trend Logs
+let isSyncRunning = false;
+
+const BATCH_SIZE = 5;
+
+// ==========================
+// Batch Processor
+// ==========================
+const processInBatches = async (items, handler) => {
+  for (let i = 0; i < items.length; i += BATCH_SIZE) {
+    const batch = items.slice(i, i + BATCH_SIZE);
+
+    await Promise.allSettled(batch.map((item) => handler(item)));
+  }
+};
+
+// ==========================
+// Sync Trend Logs
+// ==========================
 const syncTrendLogs = async () => {
-  try {
-    const response = await auroraService("getTrendlog", getTrend());
+  console.log("📥 Syncing Trend Logs...");
 
-    const trendlogs = response?.response?.trendlog || [];
+  const response = await auroraService("getTrendlog", getTrend());
 
-    await saveTrendLogs(trendlogs);
+  const trendLogs = response?.response?.trendlog || [];
 
-    for (const item of trendlogs) {
-      try {
-        const trendData = await auroraService(
-          "getTrendlogData",
-          getTrendData({
-            instance: item.instance,
-          }),
-        );
+  console.log(`✅ Trend Logs Found: ${trendLogs.length}`);
 
-        await saveTrendLogData(
-          trendData.response.host,
-          trendData.response.instance,
-          trendData.response.record,
-        );
-      } catch (err) {
-        console.log(`Trend History Failed: ${item.instance}`);
-      }
+  await saveTrendLogs(trendLogs);
+
+  await processInBatches(trendLogs, async (item) => {
+    try {
+      console.log(`↳ Trend History: ${item.instance}`);
+
+      const trendData = await auroraService(
+        "getTrendlogData",
+        getTrendData({
+          instance: item.instance,
+        }),
+      );
+
+      await saveTrendLogData(
+        trendData.response.host,
+        trendData.response.instance,
+        trendData.response.record || [],
+      );
+    } catch (err) {
+      console.log(`❌ Trend ${item.instance}`);
+      console.log(err.message);
     }
+  });
 
-    console.log("✅ Trend Sync Completed");
-  } catch (error) {
-    console.log("❌ Trend Sync Failed");
-    console.log(error.message);
-  }
+  console.log("✅ Trend Sync Completed");
 };
 
-//    Sync Energy Logs
+// ==========================
+// Sync Energy Logs
+// ==========================
 const syncEnergyLogs = async () => {
-  try {
-    const response = await auroraService("getEnergylog", getEnergy());
+  console.log("📥 Syncing Energy Logs...");
 
-    const energylogs = response?.response?.energylog || [];
+  const response = await auroraService("getEnergylog", getEnergy());
 
-    await saveEnergyLogs(energylogs);
+  const energyLogs = response?.response?.energylog || [];
 
-    for (const item of energylogs) {
-      try {
-        const energyData = await auroraService(
-          "getEnergylogData",
-          getEnergyData({
-            instance: item.instance,
-            parameter: item.parameter,
-          }),
-        );
+  console.log(`✅ Energy Logs Found: ${energyLogs.length}`);
 
-        await saveEnergyLogData(
-          energyData.response.host,
-          energyData.response.instance,
-          energyData.response.parameter,
-          energyData.response.record,
-        );
-      } catch (err) {
-        console.log(
-          `Energy History Failed: ${item.instance} - ${item.parameter}`,
-        );
-      }
+  await saveEnergyLogs(energyLogs);
+
+  await processInBatches(energyLogs, async (item) => {
+    try {
+      console.log(`↳ Energy History: ${item.instance} (${item.parameter})`);
+
+      const energyData = await auroraService(
+        "getEnergylogData",
+        getEnergyData({
+          instance: item.instance,
+          parameter: item.parameter,
+        }),
+      );
+
+      await saveEnergyLogData(
+        energyData.response.host,
+        energyData.response.instance,
+        energyData.response.parameter,
+        energyData.response.record || [],
+      );
+    } catch (err) {
+      console.log(`❌ Energy ${item.instance} (${item.parameter})`);
+      console.log(err.message);
     }
+  });
 
-    console.log("✅ Energy Sync Completed");
-  } catch (error) {
-    console.log("❌ Energy Sync Failed");
-    console.log(error.message);
+  console.log("✅ Energy Sync Completed");
+};
+
+// ==========================
+// Run Sync
+// ==========================
+export const runSync = async () => {
+  if (isSyncRunning) {
+    console.log("⏳ Previous Sync Still Running...");
+    return;
+  }
+
+  isSyncRunning = true;
+
+  try {
+    console.log("\n==============================");
+    console.log("🔄 Starting SQLite Sync...");
+    console.log("==============================");
+
+    await syncTrendLogs();
+    await syncEnergyLogs();
+
+    console.log("🎉 SQLite Sync Finished");
+  } catch (err) {
+    console.log("❌ Sync Failed");
+    console.log(err.message);
+  } finally {
+    isSyncRunning = false;
   }
 };
-//    Run Full Sync
-export const runSync = async () => {
-  console.log("🔄 Starting SQLite Sync...");
 
-  await syncTrendLogs();
-  await syncEnergyLogs();
-
-  console.log("🎉 SQLite Sync Finished");
-};
-
-//    Auto Sync Every 5 Seconds
+// ==========================
+// Auto Sync
+// ==========================
 const startSyncService = () => {
-  runSync();
+  console.log("🚀 Auto Sync Service Started");
 
-  setInterval(async () => {
+  const execute = async () => {
     await runSync();
-  }, 5000);
+
+    setTimeout(execute, 10000);
+  };
+
+  execute();
 };
 
 export default startSyncService;

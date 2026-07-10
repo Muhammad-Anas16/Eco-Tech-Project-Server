@@ -251,26 +251,4 @@ router.get("/energy/:instance/:parameter", async (req, res) => {
   }
 });
 
-//  Get Users
-router.get("/users", async (req, res) => {
-  try {
-    const data = await auroraService("getUser", getUsers());
-
-    ResHelper(res, 200, true, "Getting Users", data);
-  } catch (error) {
-    ResHelper(res, 500, false, error.message, null);
-  }
-});
-
-//  Get Groups
-router.get("/groups", async (req, res) => {
-  try {
-    const data = await auroraService("getGroup", getGroups());
-
-    ResHelper(res, 200, true, "Getting Groups", data);
-  } catch (error) {
-    ResHelper(res, 500, false, error.message, null);
-  }
-});
-
 export default router;

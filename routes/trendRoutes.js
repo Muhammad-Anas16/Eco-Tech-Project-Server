@@ -18,7 +18,6 @@ router.get("/", async (req, res) => {
     ResHelper(res, 500, false, error.message, null);
   }
 });
-
 //    Get Single Trend Log + History
 router.get("/:instance", async (req, res) => {
   try {
