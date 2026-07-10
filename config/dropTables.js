@@ -1,4 +1,4 @@
-import { database } from "./SQL_DB.js";
+import { database } from "./SQLite_DB.js";
 
 const dropTables = async () => {
   try {

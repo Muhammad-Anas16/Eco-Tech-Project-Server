@@ -4,15 +4,18 @@ import axios from "axios";
 import crypto from "crypto";
 import cors from "cors";
 import ResHelper from "./helper/ResHelper.js";
+import SQLite_DB from "./config/SQLite_DB.js";
 import dataRoutes from "./routes/dataRoutes.js";
-import SQL_DB from "./config/SQL_DB.js";
-import dropTables from "./config/dropTables.js";
+import trendRoutes from "./routes/trendRoutes.js";
+import energyRoutes from "./routes/energyRoutes.js";
 
 const app = express();
 const PORT = 5000;
 
 app.use(cors());
 app.use("/", dataRoutes);
+app.use("/api/trend", trendRoutes);
+app.use("/api/energy", energyRoutes);
 
 app.get("/", (req, res) => {
   ResHelper(res, 200, true, "Server is runing Perfectly", null);
@@ -20,7 +23,7 @@ app.get("/", (req, res) => {
 
 const startServer = async () => {
   try {
-    await SQL_DB();
+    await SQLite_DB();
     // await dropTables(); // for deleting all the tables
     app.listen(5000, "0.0.0.0", () => {
       console.log("Access from network: http://192.168.1.106:5000");
